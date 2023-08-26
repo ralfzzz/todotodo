@@ -25,10 +25,10 @@
                 <div class="col-md-2 px-0">
                     <ul class="nav justify-content-center">
                         <li class="nav-item">
-                            <a class="nav-link text-dark <%= active=='todo' ? 'active' : ''%>" href="/">Personal Todo</a>
+                            <a class="nav-link text-dark" href="/">Personal Todo</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark <%= active=='work' ? 'active' : '' %>" href="/work">Work Todo</a>
+                            <a class="nav-link text-dark <%= active %>" href="/work">Work Todo</a>
                         </li>
                     </ul>
                 </div>
@@ -41,7 +41,7 @@
             <div class="col-md-8">
                 <form action="/add" method="POST">
                 <div class="input-group mb-3">
-                        <input type="text" class="form-control" placeholder="add tododo..." name="todo" required autofocus>
+                        <input type="text" class="form-control" placeholder="add tododo..." name="todo" required>
                         <button class="btn btn-primary" type="submit"><i class="fa-solid fa-calendar-plus"></i></button>
                     </div>
                 </form>
@@ -54,11 +54,11 @@
             <div class="col-md-8">
                 <div class="card mx-auto border-0">
                     <ul class="list-group list-group-flush border-0">
-                    <% for( var i = 0; i < todo.length; i++){ %>
-                            <li class="list-group-item d-flex justify-content-between" id="<%= todo[i] %>">
+                    <% for( var i = 0; i < workTodo.length; i++){ %>
+                            <li class="list-group-item d-flex justify-content-between" id="<%= workTodo[i] %>">
                                 <div class="list">
                                     <p class="form-check-label p-0 m-0">
-                                        <%= todo[i] %>
+                                        <%= workTodo[i] %>
                                     </p>
                                 </div>
                                 <div class="button d-flex gap-1">
@@ -66,7 +66,7 @@
                                         <button class="badge bg-success border-0" type="submit"><i class="fa-solid fa-check"></i></button>
                                     </form>
                                     <form action="/delete" method="post">
-                                        <input type="hidden" value="<%= i %>" name="deletedTodo">
+                                        <input type="hidden" value="<%= workTodo[i] %>" name="deletedTodo">
                                         <button class="badge bg-danger border-0" type="submit"><i class="fa-regular fa-trash-can"></i></button>
                                     </form>
                                 </div>
@@ -79,7 +79,7 @@
         </div>
     </div>
     <!-- Footer -->
-    <div class="container-fluid footer mt-5 <%= todo.length >= 14 ? 'sticky-bottom' : 'fixed-bottom' %>">
+    <div class="container-fluid footer sticky-bottom mt-5">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <p class="text-dark fw-bold d-block text-center py-3 my-auto">Copyright © 2023 by ralfzzz</p>
