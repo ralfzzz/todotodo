@@ -21,26 +21,38 @@ let workTodo = ["kerja", "kerja2"];
 app.get('/', (req, res) => {
     res.render('todo.ejs',{
         'todo' : todo, 
-        'active': 'todo'
+        'active': 'todo',
     })
 })
 
 app.post('/add', (req, res, next) => {
     let newTodo = req.body.todo;
-    todo.push(newTodo);
-    res.redirect('/')
+    // console.log(req.body.add);
+    if(req.body.add == 'todo'){
+        todo.push(newTodo);
+        res.redirect('/')
+    } else {
+        workTodo.push(newTodo);
+        res.redirect('/work');
+    }
+
 })
 
 app.post('/delete', (req,res, next) => {
     // console.log(req.body.deletedTodo);
     let deletedTodo = req.body.deletedTodo;
-    todo.splice(deletedTodo, 1);
-    res.redirect('/');
+    if(req.body.deleted == 'todo'){
+        todo.splice(deletedTodo, 1);
+        res.redirect('/');
+    } else {
+        workTodo.splice(deletedTodo, 1);
+        res.redirect('/work');
+    }
 })
 
 app.get('/work', (req, res) => {
     res.render('todo.ejs', {
         'todo': workTodo,
-        'active': 'work'
+        'active': 'work',
     });
 })

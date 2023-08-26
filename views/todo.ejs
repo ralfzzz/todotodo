@@ -41,6 +41,11 @@
             <div class="col-md-8">
                 <form action="/add" method="POST">
                 <div class="input-group mb-3">
+                        <% if (active=='todo') { %>
+                            <input type="hidden" name="add" value="todo">
+                        <% } else {%>
+                            <input type="hidden" name="add" value="work">
+                        <% } %>
                         <input type="text" class="form-control" placeholder="add tododo..." name="todo" required autofocus>
                         <button class="btn btn-primary" type="submit"><i class="fa-solid fa-calendar-plus"></i></button>
                     </div>
@@ -66,6 +71,11 @@
                                         <button class="badge bg-success border-0" type="submit"><i class="fa-solid fa-check"></i></button>
                                     </form>
                                     <form action="/delete" method="post">
+                                        <% if (active=='todo') { %>
+                                            <input type="hidden" name="deleted" value="todo">
+                                        <% } else {%>
+                                            <input type="hidden" name="deleted" value="work">
+                                        <% } %>
                                         <input type="hidden" value="<%= i %>" name="deletedTodo">
                                         <button class="badge bg-danger border-0" type="submit"><i class="fa-regular fa-trash-can"></i></button>
                                     </form>
