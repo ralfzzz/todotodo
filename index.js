@@ -1,5 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
+import cron from "node-cron";
 
 const app = express();
 const port = 8003;
@@ -75,3 +76,13 @@ app.post('/checked', (req,res) => {
         res.redirect('/work');
     }
 })
+
+cron.schedule('0 0 * * *', () => {
+    if (todo.length>50 || workTodo.length>50) {
+        todo = ["tododo1", "tododo2","tododo3"];
+        checkedTodo = ["check", "uncheck","uncheck"];
+        workTodo = ["tododo1", "tododo2","tododo3"];
+        checkedWorkTodo = ["uncheck", "check","uncheck"];
+        console.log('tododo data restarted!');
+    }
+  });
