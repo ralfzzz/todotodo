@@ -15,27 +15,39 @@ app.get('/tes',(req, res) => {
     res.send('ralfzzz ready!');
 });
 
-let todo = ["makan", "makan2"];
-let workTodo = ["kerja", "kerja2"];
+let todo = ["tododo1", "tododo2","tododo3"];
+let checkedTodo = ["check", "uncheck","uncheck"];
+let workTodo = ["tododo1", "tododo2","tododo3"];
+let checkedWorkTodo = ["uncheck", "check","uncheck"];
 
 app.get('/', (req, res) => {
     res.render('todo.ejs',{
         'todo' : todo, 
         'active': 'todo',
+        'check': checkedTodo,
     })
+})
+
+app.get('/work', (req, res) => {
+    res.render('todo.ejs', {
+        'todo': workTodo,
+        'active': 'work',
+        'check': checkedWorkTodo,
+    });
 })
 
 app.post('/add', (req, res, next) => {
     let newTodo = req.body.todo;
     // console.log(req.body.add);
     if(req.body.add == 'todo'){
-        todo.push(newTodo);
+        todo.unshift(newTodo);
+        checkedTodo.unshift('');
         res.redirect('/')
     } else {
-        workTodo.push(newTodo);
+        workTodo.unshift(newTodo);
+        checkedWorkTodo.unshift('');
         res.redirect('/work');
     }
-
 })
 
 app.post('/delete', (req,res, next) => {
@@ -43,16 +55,23 @@ app.post('/delete', (req,res, next) => {
     let deletedTodo = req.body.deletedTodo;
     if(req.body.deleted == 'todo'){
         todo.splice(deletedTodo, 1);
+        checkedTodo.splice(deletedTodo, 1);
         res.redirect('/');
     } else {
         workTodo.splice(deletedTodo, 1);
+        checkedWorkTodo.splice(deletedTodo, 1);
         res.redirect('/work');
     }
 })
 
-app.get('/work', (req, res) => {
-    res.render('todo.ejs', {
-        'todo': workTodo,
-        'active': 'work',
-    });
+app.post('/checked', (req,res) => {
+    let check = req.body.check;
+    // console.log(req.body.add);
+    if(req.body.checked == 'todo'){
+        checkedTodo[check] = checkedTodo[check]=='check'?'':'check';
+        res.redirect('/')
+    } else {
+        checkedWorkTodo[check] = checkedWorkTodo[check]=='check'?'':'check';
+        res.redirect('/work');
+    }
 })

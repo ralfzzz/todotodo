@@ -46,7 +46,7 @@
                         <% } else {%>
                             <input type="hidden" name="add" value="work">
                         <% } %>
-                        <input type="text" class="form-control" placeholder="add tododo..." name="todo" required autofocus>
+                        <input type="text" class="form-control rounded-start" placeholder="add tododo..." name="todo" required autofocus>
                         <button class="btn btn-primary" type="submit"><i class="fa-solid fa-calendar-plus"></i></button>
                     </div>
                 </form>
@@ -57,17 +57,23 @@
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <div class="card mx-auto border-0">
+                <div class="card mx-auto border-0 shadow">
                     <ul class="list-group list-group-flush border-0">
                     <% for( var i = 0; i < todo.length; i++){ %>
-                            <li class="list-group-item d-flex justify-content-between" id="<%= todo[i] %>">
+                            <li class="list-group-item d-flex justify-content-between <%= check[i] %>" id="<%= todo[i] %>">
                                 <div class="list">
-                                    <p class="form-check-label p-0 m-0">
-                                        <%= todo[i] %>
+                                    <p class="form-check-label pe-1 m-0">
+                                        <i class="fa-solid fa-thumbtack pe-2"></i><%= todo[i] %>
                                     </p>
                                 </div>
                                 <div class="button d-flex gap-1">
                                     <form action="/checked" method="post">
+                                        <% if (active=='todo') { %>
+                                            <input type="hidden" name="checked" value="todo">
+                                        <% } else {%>
+                                            <input type="hidden" name="checked" value="work">
+                                        <% } %>
+                                        <input type="hidden" value="<%= i %>" name="check">
                                         <button class="badge bg-success border-0" type="submit"><i class="fa-solid fa-check"></i></button>
                                     </form>
                                     <form action="/delete" method="post">
@@ -89,7 +95,7 @@
         </div>
     </div>
     <!-- Footer -->
-    <div class="container-fluid footer mt-5 <%= todo.length >= 14 ? 'sticky-bottom' : 'fixed-bottom' %>">
+    <div class="container-fluid footer mt-5 <%= todo.length >= 13 ? 'sticky-bottom' : 'fixed-bottom' %>">
         <div class="row justify-content-center">
             <div class="col-md-8">
                 <p class="text-dark fw-bold d-block text-center py-3 my-auto">Copyright © <%= new Date().getFullYear(); %> by ralfzzz</p>

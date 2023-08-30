@@ -10,10 +10,10 @@ body{
     background-image: linear-gradient(to right, rgba(0, 0, 0, 0.6) 0 100%), url('https://source.unsplash.com/1920x1080?home');
     background-size: cover;
 }
-
+/* 
 input[type=checkbox]:checked + label.strikethrough{
     text-decoration: line-through;
-  }
+  } */
 
 span { 
     cursor: pointer; 
@@ -21,6 +21,11 @@ span {
 
 .active{
     text-decoration: underline;
+}
+
+.check{
+    background-color: green;
+    text-decoration: line-through;
 }
 
 /* .footer {
