@@ -1,29 +1,60 @@
 import express from "express";
 import bodyParser from "body-parser";
-import cron from "node-cron";
+// import cron from "node-cron";
+import mongoose, { Mongoose } from "mongoose";
 
 const app = express();
 const port = 8003;
-
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended:false}));
-
-app.listen(port,() => {
-    console.log(`node running on port ${port}`);
-});
 
 app.get('/tes',(req, res) => {
     res.send('ralfzzz ready!');
 });
 
-let todo = ["tododo1", "tododo2","tododo3"];
+mongoose.connect('mongodb://127.0.0.1:27017/todoDB') // if error it will throw async error
+    .then(() => { // if all is ok we will be here
+        return app.listen(port,() => {
+            console.log(`node and mongo is running`);
+        });
+    })
+    .catch(err => { // we will not be here...
+        console.error('App starting error:', err.stack);
+        process.exit(1);
+    });
+
+//CREATE MODEL/COLLECTIONS with data types & validations
+const todoSchema = new mongoose.Schema({
+    todo: {
+        type: String,
+        required: true
+      }
+});
+
+//DEFINE DATA INSERTED
+const Todo = mongoose.model('todos', todoSchema);
+
+const todo = new Todo({
+    todo:"asdfasdf"
+})
+
+// await todo.save().then((res,err)=>{
+//     if (!err) {
+//         console.log("todo inserted!")
+//     } else {
+//         console.log(err)
+//     }
+// });
+
+
+let todo2 = ["tododo1", "tododo2","tododo3"];
 let checkedTodo = ["check", "uncheck","uncheck"];
 let workTodo = ["tododo1", "tododo2","tododo3"];
 let checkedWorkTodo = ["uncheck", "check","uncheck"];
 
 app.get('/', (req, res) => {
     res.render('todo.ejs',{
-        'todo' : todo, 
+        'todo' : todo2, 
         'active': 'todo',
         'check': checkedTodo,
     })
@@ -77,12 +108,12 @@ app.post('/checked', (req,res) => {
     }
 })
 
-cron.schedule('0 0 * * *', () => {
-    if (todo.length>50 || workTodo.length>50) {
-        todo = ["tododo1", "tododo2","tododo3"];
-        checkedTodo = ["check", "uncheck","uncheck"];
-        workTodo = ["tododo1", "tododo2","tododo3"];
-        checkedWorkTodo = ["uncheck", "check","uncheck"];
-        console.log('tododo data restarted!');
-    }
-  });
+// cron.schedule('0 0 * * *', () => {
+//     if (todo.length>50 || workTodo.length>50) {
+//         todo = ["tododo1", "tododo2","tododo3"];
+//         checkedTodo = ["check", "uncheck","uncheck"];
+//         workTodo = ["tododo1", "tododo2","tododo3"];
+//         checkedWorkTodo = ["uncheck", "check","uncheck"];
+//         console.log('tododo data restarted!');
+//     }
+//   });
