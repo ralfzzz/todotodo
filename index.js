@@ -12,7 +12,7 @@ app.get('/tes',(req, res) => {
     res.send('ralfzzz ready!');
 });
 
-mongoose.connect('mongodb://127.0.0.1:27017/todoDB') // if error it will throw async error
+mongoose.connect('mongodb+srv://horsejaran22:V7pey02EdxEhc3F2@cluster0.k1mgs8m.mongodb.net/todoDB') // if error it will throw async error
     .then(() => { // if all is ok we will be here
         return app.listen(port,() => {
             console.log(`node and mongo is running`);
@@ -38,13 +38,13 @@ const todo = new Todo({
     todo:"asdfasdf"
 })
 
-// await todo.save().then((res,err)=>{
-//     if (!err) {
-//         console.log("todo inserted!")
-//     } else {
-//         console.log(err)
-//     }
-// });
+await todo.save().then((res,err)=>{
+    if (!err) {
+        console.log("todo inserted!")
+    } else {
+        console.log(err)
+    }
+});
 
 
 let todo2 = ["tododo1", "tododo2","tododo3"];
