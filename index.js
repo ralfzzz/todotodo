@@ -2,6 +2,8 @@ import express from "express";
 import bodyParser from "body-parser";
 // import cron from "node-cron";
 import mongoose from "mongoose";
+import mongooseUniqueValidator from "mongoose-unique-validator";
+import 'dotenv/config';
 
 const app = express();
 const port = 8003;
@@ -12,7 +14,7 @@ app.get('/tes',(req, res) => {
     res.send('ralfzzz ready!');
 });
 
-mongoose.connect('mongodb+srv://horsejaran22:V7pey02EdxEhc3F2@cluster0.k1mgs8m.mongodb.net/todoDB') // if error it will throw async error
+mongoose.connect(process.env.URI_MONGODB) // if error it will throw async error
     .then(() => { // if all is ok we will be here
         return app.listen(port,() => {
             console.log(`node and mongo is running`);
@@ -27,6 +29,7 @@ mongoose.connect('mongodb+srv://horsejaran22:V7pey02EdxEhc3F2@cluster0.k1mgs8m.m
 const todoSchema = new mongoose.Schema({
     todo: {
         type: String,
+        unique: true
       },
       statusTodo: {
         type: String,
@@ -35,12 +38,15 @@ const todoSchema = new mongoose.Schema({
 const workTodoSchema = new mongoose.Schema({
     workTodo: {
         type: String,
+        unique: true
       },
       statusWorkTodo: {
         type: String,
       }
 });
 
+todoSchema.plugin(mongooseUniqueValidator);
+workTodoSchema.plugin(mongooseUniqueValidator);
 const Todo = mongoose.model('todos', todoSchema);
 const WorkTodo = mongoose.model('workTodos', workTodoSchema);
 
@@ -87,10 +93,10 @@ let todoList = [];
 let statusTodo = [];
 let workTodo = [];
 let statusWorkTodo = [];
+let status = 'success';
 
 app.get('/', async (req, res) => {
-    await Todo.find({}).then((res,err)=>{
-        if (!err) {
+    await Todo.find({}).then((res)=>{
             if (res.length !== todoList.length) {
                 todoList = [];
                 statusTodo = [];
@@ -98,22 +104,21 @@ app.get('/', async (req, res) => {
                     todoList.unshift(todos.todo);
                     statusTodo.unshift(todos.statusTodo);
                 });   
-                console.log(todoList);
+                // console.log(todoList);
             }
-        } else {
-            console.log(err);
-        }
+    }).catch(error => {
+        console.log(error);
     });
     res.render('todo.ejs',{
         'todo' : todoList, 
         'active': 'todo',
         'check': statusTodo,
+        'status': status
     })
 })
 
 app.get('/work', async (req, res) => {
-    await WorkTodo.find({}).then((res,err)=>{
-        if (!err) {
+    await WorkTodo.find({}).then((res)=>{
             if (res.length !== workTodo.length) {
                 workTodo = [];
                 statusWorkTodo = [];
@@ -122,51 +127,48 @@ app.get('/work', async (req, res) => {
                     statusWorkTodo.unshift(todos.statusWorkTodo);
                 });
             };   
-        } else {
-            console.log(err);
-        }
+    }).catch(error => {
+        console.log(error);
     });
     res.render('todo.ejs', {
         'todo': workTodo,
         'active': 'work',
         'check': statusWorkTodo,
+        'status': status
     });
 })
 
 app.post('/addTodo', async (req, res, next) => {
     let newTodo = req.body.todo;
     // console.log(req.body.add);
+    if (todoList.includes(newTodo)) {
+        status = 'REminder: maKe unIque TODO!'
+    } else {
     const todo = new Todo({
         todo:newTodo,
         statusTodo:"uncheck",
     })
-    await todo.save().then((res,err)=>{
-        if (!err) {
-            console.log("todo inserted!");
-            mongoose.connection.on('exit', function (){
-                mongoose.disconnect();
-            });
-        } else {
-            console.log(err);
-        }
-    });
+    // console.log(todoList);
+        await todo.save().then((res)=>{
+            if (!res) {
+                console.log("todo inserted!");
+                mongoose.connection.on('exit', function (){
+                    mongoose.disconnect();
+                });
+            } else {
+                console.log(err.message);
+            }
+        });
+    }
     res.redirect('/')
-    
-    // if(req.body.add == 'todo'){
-    //     todoList.unshift(newTodo);
-    //     checkedTodo.unshift('');
-    //     res.redirect('/')
-    // } else {
-    //     workTodo.unshift(newTodo);
-    //     checkedWorkTodo.unshift('');
-    //     res.redirect('/work');
-    // }
 })
 
 app.post('/addWorkTodo', async (req, res, next) => {
     let newTodo = req.body.todo;
     // console.log(req.body.add);
-    if (newTodo!==null) {        
+    if (workTodo.includes(newTodo)) {
+        status = 'REminder: maKe unIque TODO!'
+    } else {
         const workTodoDB = new WorkTodo({
             workTodo:newTodo,
             statusWorkTodo:"uncheck",
@@ -184,15 +186,6 @@ app.post('/addWorkTodo', async (req, res, next) => {
     }
     res.redirect('/work')
 
-    // if(req.body.add == 'todo'){
-    //     todoList.unshift(newTodo);
-    //     checkedTodo.unshift('');
-    //     res.redirect('/')
-    // } else {
-    //     workTodo.unshift(newTodo);
-    //     checkedWorkTodo.unshift('');
-    //     res.redirect('/work');
-    // }
 })
 
 app.post('/delete', (req,res, next) => {
