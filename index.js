@@ -1,7 +1,7 @@
 import express from "express";
 import bodyParser from "body-parser";
 // import cron from "node-cron";
-import mongoose, { Mongoose } from "mongoose";
+import mongoose from "mongoose";
 
 const app = express();
 const port = 8003;
@@ -27,59 +27,172 @@ mongoose.connect('mongodb+srv://horsejaran22:V7pey02EdxEhc3F2@cluster0.k1mgs8m.m
 const todoSchema = new mongoose.Schema({
     todo: {
         type: String,
-        required: true
+      },
+      statusTodo: {
+        type: String,
+      }
+});
+const workTodoSchema = new mongoose.Schema({
+    workTodo: {
+        type: String,
+      },
+      statusWorkTodo: {
+        type: String,
       }
 });
 
-//DEFINE DATA INSERTED
 const Todo = mongoose.model('todos', todoSchema);
+const WorkTodo = mongoose.model('workTodos', workTodoSchema);
 
-const todo = new Todo({
-    todo:"asdfasdf"
-})
+//DEFINE DATA INSERTED
 
-await todo.save().then((res,err)=>{
-    if (!err) {
-        console.log("todo inserted!")
-    } else {
-        console.log(err)
-    }
-});
+// const todo = new Todo({
+//     todo:"makan3",
+//     statusTodo:"uncheck",
+//     workTodo:"makan4",
+//     statusWorkTodo:"check",
+// })
+
+// await todo.save().then((res,err)=>{
+//     if (!err) {
+//         console.log("todo inserted!");
+//         mongoose.connection.on('exit', function (){
+//             mongoose.disconnect();
+//         });
+//     } else {
+//         console.log(err);
+//     }
+// });
 
 
-let todo2 = ["tododo1", "tododo2","tododo3"];
-let checkedTodo = ["check", "uncheck","uncheck"];
-let workTodo = ["tododo1", "tododo2","tododo3"];
-let checkedWorkTodo = ["uncheck", "check","uncheck"];
+//GET DATA INSERTED
+// let todo2 = [];
+// await Todo.find({}).then((res,err)=>{
+//     if (!err) {
+//         res.forEach(todos => {
+//             todo2.unshift(todos.todo)
+//         });
+//         // return todo2;
+//     } else {
+//         console.log(err);
+//     }
+// });
 
-app.get('/', (req, res) => {
+
+// let todo2 = ["tododo1", "tododo2","tododo3"];
+// let checkedTodo = ["check", "uncheck","uncheck"];
+// let workTodo = ["tododo1", "tododo2","tododo3"];
+// let checkedWorkTodo = ["uncheck", "check","uncheck"];
+let todoList = [];
+let statusTodo = [];
+let workTodo = [];
+let statusWorkTodo = [];
+
+app.get('/', async (req, res) => {
+    await Todo.find({}).then((res,err)=>{
+        if (!err) {
+            if (res.length !== todoList.length) {
+                todoList = [];
+                statusTodo = [];
+                res.forEach(todos => {
+                    todoList.unshift(todos.todo);
+                    statusTodo.unshift(todos.statusTodo);
+                });   
+                console.log(todoList);
+            }
+        } else {
+            console.log(err);
+        }
+    });
     res.render('todo.ejs',{
-        'todo' : todo2, 
+        'todo' : todoList, 
         'active': 'todo',
-        'check': checkedTodo,
+        'check': statusTodo,
     })
 })
 
-app.get('/work', (req, res) => {
+app.get('/work', async (req, res) => {
+    await WorkTodo.find({}).then((res,err)=>{
+        if (!err) {
+            if (res.length !== workTodo.length) {
+                workTodo = [];
+                statusWorkTodo = [];
+                res.forEach(todos => {
+                    workTodo.unshift(todos.workTodo);
+                    statusWorkTodo.unshift(todos.statusWorkTodo);
+                });
+            };   
+        } else {
+            console.log(err);
+        }
+    });
     res.render('todo.ejs', {
         'todo': workTodo,
         'active': 'work',
-        'check': checkedWorkTodo,
+        'check': statusWorkTodo,
     });
 })
 
-app.post('/add', (req, res, next) => {
+app.post('/addTodo', async (req, res, next) => {
     let newTodo = req.body.todo;
     // console.log(req.body.add);
-    if(req.body.add == 'todo'){
-        todo.unshift(newTodo);
-        checkedTodo.unshift('');
-        res.redirect('/')
-    } else {
-        workTodo.unshift(newTodo);
-        checkedWorkTodo.unshift('');
-        res.redirect('/work');
+    const todo = new Todo({
+        todo:newTodo,
+        statusTodo:"uncheck",
+    })
+    await todo.save().then((res,err)=>{
+        if (!err) {
+            console.log("todo inserted!");
+            mongoose.connection.on('exit', function (){
+                mongoose.disconnect();
+            });
+        } else {
+            console.log(err);
+        }
+    });
+    res.redirect('/')
+    
+    // if(req.body.add == 'todo'){
+    //     todoList.unshift(newTodo);
+    //     checkedTodo.unshift('');
+    //     res.redirect('/')
+    // } else {
+    //     workTodo.unshift(newTodo);
+    //     checkedWorkTodo.unshift('');
+    //     res.redirect('/work');
+    // }
+})
+
+app.post('/addWorkTodo', async (req, res, next) => {
+    let newTodo = req.body.todo;
+    // console.log(req.body.add);
+    if (newTodo!==null) {        
+        const workTodoDB = new WorkTodo({
+            workTodo:newTodo,
+            statusWorkTodo:"uncheck",
+        })
+        await workTodoDB.save().then((res,err)=>{
+            if (!err) {
+                console.log("todo inserted!");
+                mongoose.connection.on('exit', function (){
+                    mongoose.disconnect();
+                });
+            } else {
+                console.log(err);
+            }
+        });
     }
+    res.redirect('/work')
+
+    // if(req.body.add == 'todo'){
+    //     todoList.unshift(newTodo);
+    //     checkedTodo.unshift('');
+    //     res.redirect('/')
+    // } else {
+    //     workTodo.unshift(newTodo);
+    //     checkedWorkTodo.unshift('');
+    //     res.redirect('/work');
+    // }
 })
 
 app.post('/delete', (req,res, next) => {

@@ -39,11 +39,7 @@
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <% if (active=='todo') { %>
-                    <form action="/addTodo" method="POST">
-                <% } else {%>
-                    <form action="/addWorkTodo" method="POST">
-                <% } %>
+                <form action="/addTodo" method="POST">
                 <div class="input-group mb-3 shadow">
                         <% if (active=='todo') { %>
                             <input type="hidden" name="add" value="todo">
@@ -67,7 +63,7 @@
                             <li class="list-group-item d-flex justify-content-between <%= check[i] %>" id="<%= todo[i] %>">
                                 <div class="list">
                                     <p class="form-check-label pe-1 m-0">
-                                        <i class="fa-solid fa-thumbtack pe-2"></i><%= todo[i] %>
+                                        <i class="fa-solid fa-thumbtack pe-2"></i><%= workTodo[i] %>
                                     </p>
                                 </div>
                                 <div class="button d-flex gap-1">
