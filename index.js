@@ -149,8 +149,8 @@ app.post('/addTodo', async (req, res, next) => {
         statusTodo:"uncheck",
     })
     // console.log(todoList);
-        await todo.save().then((res)=>{
-            if (!res) {
+        await todo.save().then((res,err)=>{
+            if (!err) {
                 console.log("todo inserted!");
                 mongoose.connection.on('exit', function (){
                     mongoose.disconnect();
