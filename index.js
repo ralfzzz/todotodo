@@ -50,45 +50,7 @@ workTodoSchema.plugin(mongooseUniqueValidator);
 const Todo = mongoose.model('todos', todoSchema);
 const WorkTodo = mongoose.model('workTodos', workTodoSchema);
 
-//DEFINE DATA INSERTED
 
-// const todo = new Todo({
-//     todo:"makan3",
-//     statusTodo:"uncheck",
-//     workTodo:"makan4",
-//     statusWorkTodo:"check",
-// })
-
-// await todo.save().then((res,err)=>{
-//     if (!err) {
-//         console.log("todo inserted!");
-//         mongoose.connection.on('exit', function (){
-//             mongoose.disconnect();
-//         });
-//     } else {
-//         console.log(err);
-//     }
-// });
-
-
-//GET DATA INSERTED
-// let todo2 = [];
-// await Todo.find({}).then((res,err)=>{
-//     if (!err) {
-//         res.forEach(todos => {
-//             todo2.unshift(todos.todo)
-//         });
-//         // return todo2;
-//     } else {
-//         console.log(err);
-//     }
-// });
-
-
-// let todo2 = ["tododo1", "tododo2","tododo3"];
-// let checkedTodo = ["check", "uncheck","uncheck"];
-// let workTodo = ["tododo1", "tododo2","tododo3"];
-// let checkedWorkTodo = ["uncheck", "check","uncheck"];
 let todoList = [];
 let statusTodo = [];
 let workTodo = [];
@@ -188,18 +150,28 @@ app.post('/addWorkTodo', async (req, res, next) => {
 
 })
 
-app.post('/delete', (req,res, next) => {
+app.post('/deleteTodo', async (req,res, next) => {
     // console.log(req.body.deletedTodo);
     let deletedTodo = req.body.deletedTodo;
-    if(req.body.deleted == 'todo'){
-        todo.splice(deletedTodo, 1);
-        checkedTodo.splice(deletedTodo, 1);
-        res.redirect('/');
-    } else {
-        workTodo.splice(deletedTodo, 1);
-        checkedWorkTodo.splice(deletedTodo, 1);
-        res.redirect('/work');
-    }
+
+    await Todo.deleteOne({ todo: deletedTodo }).then(function(){
+        console.log("Data deleted!"); // Success
+    }).catch(function(error){
+        console.log(error); // Failure        
+    });
+    res.redirect('/');
+})
+
+app.post('/deleteWorkTodo', async (req,res, next) => {
+    // console.log(req.body.deletedTodo);
+    let deletedTodo = req.body.deletedTodo;
+
+    await WorkTodo.deleteOne({ workTodo: deletedTodo }).then(function(){
+        console.log("Data deleted!"); // Success
+    }).catch(function(error){
+        console.log(error); // Failure        
+    });
+    res.redirect('/work');
 })
 
 app.post('/checked', (req,res) => {
@@ -214,12 +186,3 @@ app.post('/checked', (req,res) => {
     }
 })
 
-// cron.schedule('0 0 * * *', () => {
-//     if (todo.length>50 || workTodo.length>50) {
-//         todo = ["tododo1", "tododo2","tododo3"];
-//         checkedTodo = ["check", "uncheck","uncheck"];
-//         workTodo = ["tododo1", "tododo2","tododo3"];
-//         checkedWorkTodo = ["uncheck", "check","uncheck"];
-//         console.log('tododo data restarted!');
-//     }
-//   });

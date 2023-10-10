@@ -92,13 +92,14 @@
                                         <input type="hidden" value="<%= i %>" name="check">
                                         <button class="badge bg-success border-0" type="submit"><i class="fa-solid fa-check"></i></button>
                                     </form>
-                                    <form action="/delete" method="post">
-                                        <% if (active=='todo') { %>
+                                    <% if (active=='todo') { %>
+                                            <form action="/deleteTodo" method="post">
                                             <input type="hidden" name="deleted" value="todo">
                                         <% } else {%>
+                                            <form action="/deleteWorkTodo" method="post">
                                             <input type="hidden" name="deleted" value="work">
                                         <% } %>
-                                        <input type="hidden" value="<%= i %>" name="deletedTodo">
+                                        <input type="hidden" value="<%= todo[i] %>" name="deletedTodo">
                                         <button class="badge bg-danger border-0" type="submit"><i class="fa-regular fa-trash-can"></i></button>
                                     </form>
                                 </div>
