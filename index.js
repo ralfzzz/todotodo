@@ -59,7 +59,7 @@ let status = 'success';
 
 app.get('/', async (req, res) => {
     await Todo.find({}).then((res)=>{
-            if (res.length !== todoList.length) {
+            if (res !== todoList) {
                 todoList = [];
                 statusTodo = [];
                 res.forEach(todos => {
@@ -81,7 +81,7 @@ app.get('/', async (req, res) => {
 
 app.get('/work', async (req, res) => {
     await WorkTodo.find({}).then((res)=>{
-            if (res.length !== workTodo.length) {
+            if (res !== workTodo) {
                 workTodo = [];
                 statusWorkTodo = [];
                 res.forEach(todos => {
@@ -174,15 +174,44 @@ app.post('/deleteWorkTodo', async (req,res, next) => {
     res.redirect('/work');
 })
 
-app.post('/checked', (req,res) => {
+app.post('/checkedTodo', async (req,res) => {
     let check = req.body.check;
+    let key = req.body.key;
+    console.log(key);
     // console.log(req.body.add);
-    if(req.body.checked == 'todo'){
-        checkedTodo[check] = checkedTodo[check]=='check'?'':'check';
-        res.redirect('/')
+    if (check == "check") {
+        await Todo.updateOne({ todo: key },{statusTodo: "uncheck"}).then(function(){
+            console.log("Data updated!"); // Success
+        }).catch(function(error){
+            console.log(error); // Failure        
+        });
     } else {
-        checkedWorkTodo[check] = checkedWorkTodo[check]=='check'?'':'check';
-        res.redirect('/work');
+        await Todo.updateOne({ todo: key },{statusTodo: "check"}).then(function(){
+            console.log("Data updated!"); // Success
+        }).catch(function(error){
+            console.log(error); // Failure        
+        });
     }
+    res.redirect('/');
 })
 
+app.post('/checkedWorkTodo', async (req,res) => {
+    let check = req.body.check;
+    let key = req.body.key;
+    console.log(key);
+    // console.log(req.body.add);
+    if (check == "check") {
+        await WorkTodo.updateOne({ workTodo: key },{statusWorkTodo: "uncheck"}).then(function(){
+            console.log("Data updated!"); // Success
+        }).catch(function(error){
+            console.log(error); // Failure        
+        });
+    } else {
+        await WorkTodo.updateOne({ workTodo: key },{statusWorkTodo: "check"}).then(function(){
+            console.log("Data updated!"); // Success
+        }).catch(function(error){
+            console.log(error); // Failure        
+        });
+    }
+    res.redirect('/work');
+})

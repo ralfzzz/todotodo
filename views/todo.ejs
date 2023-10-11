@@ -83,13 +83,15 @@
                                     </p>
                                 </div>
                                 <div class="button d-flex gap-1">
-                                    <form action="/checked" method="post">
-                                        <% if (active=='todo') { %>
+                                    <% if (active=='todo') { %>
+                                        <form action="/checkedTodo" method="post">
                                             <input type="hidden" name="checked" value="todo">
                                         <% } else {%>
+                                        <form action="/checkedWorkTodo" method="post">
                                             <input type="hidden" name="checked" value="work">
                                         <% } %>
-                                        <input type="hidden" value="<%= i %>" name="check">
+                                        <input type="hidden" value="<%= check[i] %>" name="check">
+                                        <input type="hidden" value="<%= todo[i] %>" name="key">
                                         <button class="badge bg-success border-0" type="submit"><i class="fa-solid fa-check"></i></button>
                                     </form>
                                     <% if (active=='todo') { %>
