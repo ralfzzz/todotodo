@@ -2,7 +2,7 @@ import express from "express";
 import bodyParser from "body-parser";
 // import cron from "node-cron";
 import mongoose from "mongoose";
-import mongooseUniqueValidator from "mongoose-unique-validator";
+// import mongooseUniqueValidator from "mongoose-unique-validator";
 import 'dotenv/config';
 import _ from "lodash";
 
@@ -233,13 +233,17 @@ const customListSchema = new mongoose.Schema({
 const List = mongoose.model('list', customListSchema);
 
 
+app.get("/custom", async (req,res,next) => {
+    res.render("tes");
+})
+
 app.get('/custom/:tab', async (req,res,next) => {
     let tab = req.params.tab;
     let customTab = _.capitalize(tab);
     
-    await List.findOne({customTab: customTab}).exec().then((res) => {
-        if (res !== null) {
-            if (res.customTab == customTab) {
+    await List.findOne({customTab: customTab}).exec().then((e) => {
+        if (e !== null) {
+            if (e.customTab == customTab) {
                 let add = ({todo: "tes2", statusTodo: "uncheck"});
                 List.updateOne(
                     { customTab: res.customTab }, 
@@ -259,5 +263,5 @@ app.get('/custom/:tab', async (req,res,next) => {
         }
     });
 
-    res.redirect("/");
+    // res.redirect("/custom");
 })
