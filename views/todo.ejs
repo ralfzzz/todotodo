@@ -76,7 +76,7 @@
                 <div class="card mx-auto border-0 shadow">
                     <ul class="list-group list-group-flush border-0">
                     <% for( var i = 0; i < todo.length; i++){ %>
-                            <li class="list-group-item d-flex justify-content-between <%= check[i] %>" id="<%= todo[i] %>">
+                            <li class="list-group-item d-flex justify-content-between <%= check[i] %>" id="<%= id[i] %>">
                                 <div class="list">
                                     <p class="form-check-label pe-1 m-0">
                                         <i class="fa-solid fa-thumbtack pe-2"></i><%= todo[i] %>
@@ -91,7 +91,7 @@
                                             <input type="hidden" name="checked" value="work">
                                         <% } %>
                                         <input type="hidden" value="<%= check[i] %>" name="check">
-                                        <input type="hidden" value="<%= todo[i] %>" name="key">
+                                        <input type="hidden" value="<%= id[i] %>" name="key">
                                         <button class="badge bg-success border-0" type="submit"><i class="fa-solid fa-check"></i></button>
                                     </form>
                                     <% if (active=='todo') { %>
@@ -101,7 +101,7 @@
                                             <form action="/deleteWorkTodo" method="post">
                                             <input type="hidden" name="deleted" value="work">
                                         <% } %>
-                                        <input type="hidden" value="<%= todo[i] %>" name="deletedTodo">
+                                        <input type="hidden" value="<%= id[i] %>" name="deletedTodo">
                                         <button class="badge bg-danger border-0" type="submit"><i class="fa-regular fa-trash-can"></i></button>
                                     </form>
                                 </div>

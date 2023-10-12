@@ -4,15 +4,16 @@ import bodyParser from "body-parser";
 import mongoose from "mongoose";
 import mongooseUniqueValidator from "mongoose-unique-validator";
 import 'dotenv/config';
+import _ from "lodash";
 
 const app = express();
 const port = 8003;
 app.use(express.static('public'));
 app.use(bodyParser.urlencoded({extended:false}));
 
-app.get('/tes',(req, res) => {
-    res.send('ralfzzz ready!');
-});
+// app.get('/tes',(req, res) => {
+//     res.send('ralfzzz ready!');
+// });
 
 mongoose.connect(process.env.URI_MONGODB) // if error it will throw async error
     .then(() => { // if all is ok we will be here
@@ -29,7 +30,6 @@ mongoose.connect(process.env.URI_MONGODB) // if error it will throw async error
 const todoSchema = new mongoose.Schema({
     todo: {
         type: String,
-        unique: true
       },
       statusTodo: {
         type: String,
@@ -38,23 +38,24 @@ const todoSchema = new mongoose.Schema({
 const workTodoSchema = new mongoose.Schema({
     workTodo: {
         type: String,
-        unique: true
       },
       statusWorkTodo: {
         type: String,
       }
 });
 
-todoSchema.plugin(mongooseUniqueValidator);
-workTodoSchema.plugin(mongooseUniqueValidator);
+// todoSchema.plugin(mongooseUniqueValidator);
+// workTodoSchema.plugin(mongooseUniqueValidator);
 const Todo = mongoose.model('todos', todoSchema);
 const WorkTodo = mongoose.model('workTodos', workTodoSchema);
 
 
 let todoList = [];
 let statusTodo = [];
+let idTodoList = [];
 let workTodo = [];
 let statusWorkTodo = [];
+let idWorkTodo = [];
 let status = 'success';
 
 app.get('/', async (req, res) => {
@@ -65,6 +66,7 @@ app.get('/', async (req, res) => {
                 res.forEach(todos => {
                     todoList.unshift(todos.todo);
                     statusTodo.unshift(todos.statusTodo);
+                    idTodoList.unshift(todos._id)
                 });   
                 // console.log(todoList);
             }
@@ -75,7 +77,8 @@ app.get('/', async (req, res) => {
         'todo' : todoList, 
         'active': 'todo',
         'check': statusTodo,
-        'status': status
+        'status': status,
+        'id': idTodoList
     })
 })
 
@@ -87,6 +90,7 @@ app.get('/work', async (req, res) => {
                 res.forEach(todos => {
                     workTodo.unshift(todos.workTodo);
                     statusWorkTodo.unshift(todos.statusWorkTodo);
+                    idWorkTodo.unshift(todos._id)
                 });
             };   
     }).catch(error => {
@@ -96,7 +100,8 @@ app.get('/work', async (req, res) => {
         'todo': workTodo,
         'active': 'work',
         'check': statusWorkTodo,
-        'status': status
+        'status': status,
+        'id': idWorkTodo
     });
 })
 
@@ -154,7 +159,7 @@ app.post('/deleteTodo', async (req,res, next) => {
     // console.log(req.body.deletedTodo);
     let deletedTodo = req.body.deletedTodo;
 
-    await Todo.deleteOne({ todo: deletedTodo }).then(function(){
+    await Todo.deleteOne({ _id: deletedTodo }).then(function(){
         console.log("Data deleted!"); // Success
     }).catch(function(error){
         console.log(error); // Failure        
@@ -166,7 +171,7 @@ app.post('/deleteWorkTodo', async (req,res, next) => {
     // console.log(req.body.deletedTodo);
     let deletedTodo = req.body.deletedTodo;
 
-    await WorkTodo.deleteOne({ workTodo: deletedTodo }).then(function(){
+    await WorkTodo.deleteOne({ _id: deletedTodo }).then(function(){
         console.log("Data deleted!"); // Success
     }).catch(function(error){
         console.log(error); // Failure        
@@ -177,16 +182,16 @@ app.post('/deleteWorkTodo', async (req,res, next) => {
 app.post('/checkedTodo', async (req,res) => {
     let check = req.body.check;
     let key = req.body.key;
-    console.log(key);
+    // console.log(key);
     // console.log(req.body.add);
     if (check == "check") {
-        await Todo.updateOne({ todo: key },{statusTodo: "uncheck"}).then(function(){
+        await Todo.updateOne({ _id: key },{statusTodo: "uncheck"}).then(function(){
             console.log("Data updated!"); // Success
         }).catch(function(error){
             console.log(error); // Failure        
         });
     } else {
-        await Todo.updateOne({ todo: key },{statusTodo: "check"}).then(function(){
+        await Todo.updateOne({ _id: key },{statusTodo: "check"}).then(function(){
             console.log("Data updated!"); // Success
         }).catch(function(error){
             console.log(error); // Failure        
@@ -201,17 +206,58 @@ app.post('/checkedWorkTodo', async (req,res) => {
     console.log(key);
     // console.log(req.body.add);
     if (check == "check") {
-        await WorkTodo.updateOne({ workTodo: key },{statusWorkTodo: "uncheck"}).then(function(){
+        await WorkTodo.updateOne({ _id: key },{statusWorkTodo: "uncheck"}).then(function(){
             console.log("Data updated!"); // Success
         }).catch(function(error){
             console.log(error); // Failure        
         });
     } else {
-        await WorkTodo.updateOne({ workTodo: key },{statusWorkTodo: "check"}).then(function(){
+        await WorkTodo.updateOne({ _id: key },{statusWorkTodo: "check"}).then(function(){
             console.log("Data updated!"); // Success
         }).catch(function(error){
             console.log(error); // Failure        
         });
     }
     res.redirect('/work');
+})
+
+// CUSTOM ROUTE //
+//CREATE MODEL/COLLECTIONS with data types & validations
+const defaultList = [{todo: "tes2", statusTodo: "uncheck"}]
+const customListSchema = new mongoose.Schema({
+    customTab: {
+        type: String,
+      },
+      lists: [todoSchema]
+});
+const List = mongoose.model('list', customListSchema);
+
+
+app.get('/custom/:tab', async (req,res,next) => {
+    let tab = req.params.tab;
+    let customTab = _.capitalize(tab);
+    
+    await List.findOne({customTab: customTab}).exec().then((res) => {
+        if (res !== null) {
+            if (res.customTab == customTab) {
+                let add = ({todo: "tes2", statusTodo: "uncheck"});
+                List.updateOne(
+                    { customTab: res.customTab }, 
+                    { $push: { lists: add } }
+                ).then(()=>{
+                    console.log("Data updated!")
+                });
+            }
+        } else {
+            const list = new List({
+                customTab: customTab,
+                lists: defaultList
+            })
+            list.save().then(()=>{
+                console.log("Data inserted!")
+            });
+        }
+    });
+
+    res.redirect("/");
 })
