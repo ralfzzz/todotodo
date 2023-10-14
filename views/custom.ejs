@@ -25,10 +25,10 @@
                 <div class="col-md-2 px-0">
                     <ul class="nav justify-content-center">
                         <li class="nav-item">
-                            <a class="nav-link text-dark <%= active=='todo' ? 'active' : ''%>" href="/">Personal Todo</a>
+                            <a class="nav-link text-dark active" href="/custom/<%= active %>"><%= active %> [Custom Todo]</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark <%= active=='work' ? 'active' : '' %>" href="/work">Work Todo</a>
+                            <a class="nav-link text-dark" href="/custom"><i class="fa-solid fa-house"></i></a>
                         </li>
                     </ul>
                 </div>

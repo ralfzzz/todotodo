@@ -31,7 +31,7 @@
                             <a class="nav-link text-dark <%= active=='work' ? 'active' : '' %>" href="/work">Work Todo</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" href="/custom/">Custom Todo Category</a>
+                            <a class="nav-link text-dark <%= (active!=='work' &&  active!=='todo') ? 'active' : '' %>" href="/custom/">Custom Todo Category</a>
                         </li>
                     </ul>
                 </div>
@@ -54,18 +54,9 @@
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-md-8">
-                <% if (active=='todo') { %>
-                    <form action="/addTodo" method="POST">
-                <% } else {%>
-                    <form action="/addWorkTodo" method="POST">
-                <% } %>
-                <div class="input-group mb-3 shadow">
-                        <% if (active=='todo') { %>
-                            <input type="hidden" name="add" value="todo">
-                        <% } else {%>
-                            <input type="hidden" name="add" value="work">
-                        <% } %>
-                        <input type="text" class="form-control rounded-start" placeholder="add tododo..." name="todo" required autofocus>
+                    <form action="/addCustom" method="post">
+                    <div class="input-group mb-3 shadow">
+                        <input type="text" class="form-control rounded-start" placeholder="aDd TODODO CuSTOM CatEgory" name="todo" required autofocus>
                         <button class="btn btn-primary" type="submit"><i class="fa-solid fa-calendar-plus"></i></button>
                     </div>
                 </form>
@@ -78,32 +69,42 @@
             <div class="col-md-8">
                 <div class="card mx-auto border-0 shadow">
                     <ul class="list-group list-group-flush border-0">
+                        <li class="list-group-item d-flex justify-content-between ">
+                            <div class="list">
+                                <p class="form-check-label pe-1 m-0">
+                                    <i class="fa-solid fa-person"></i>  Personal Todo
+                                </p>
+                            </div>
+                            <div class="button d-flex gap-1">
+                                    <form action="/" method="get">
+                                    <button class="badge bg-success border-0" type="submit"><i class="fa-solid fa-eye"></i></button>
+                                </form>
+                            </div>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between ">
+                            <div class="list">
+                                <p class="form-check-label pe-1 m-0">
+                                    <i class="fa-solid fa-briefcase"></i> Work Todo
+                                </p>
+                            </div>
+                            <div class="button d-flex gap-1">
+                                    <form action="/work" method="get">
+                                    <button class="badge bg-success border-0" type="submit"><i class="fa-solid fa-eye"></i></button>
+                                </form>
+                            </div>
+                        </li>
                     <% for( var i = 0; i < todo.length; i++){ %>
-                            <li class="list-group-item d-flex justify-content-between <%= check[i] %>" id="<%= id[i] %>">
+                            <li class="list-group-item d-flex justify-content-between " id="<%= id[i] %>">
                                 <div class="list">
                                     <p class="form-check-label pe-1 m-0">
-                                        <i class="fa-solid fa-thumbtack pe-2"></i><%= todo[i] %>
+                                        <i class="fa-solid fa-book"></i> <%= todo[i] %>
                                     </p>
                                 </div>
                                 <div class="button d-flex gap-1">
-                                    <% if (active=='todo') { %>
-                                        <form action="/checkedTodo" method="post">
-                                            <input type="hidden" name="checked" value="todo">
-                                        <% } else {%>
-                                        <form action="/checkedWorkTodo" method="post">
-                                            <input type="hidden" name="checked" value="work">
-                                        <% } %>
-                                        <input type="hidden" value="<%= check[i] %>" name="check">
-                                        <input type="hidden" value="<%= id[i] %>" name="key">
-                                        <button class="badge bg-success border-0" type="submit"><i class="fa-solid fa-check"></i></button>
+                                        <form action="/custom/<%= active[i] %>" method="get">
+                                        <button class="badge bg-success border-0" type="submit"><i class="fa-solid fa-eye"></i></button>
                                     </form>
-                                    <% if (active=='todo') { %>
-                                            <form action="/deleteTodo" method="post">
-                                            <input type="hidden" name="deleted" value="todo">
-                                        <% } else {%>
-                                            <form action="/deleteWorkTodo" method="post">
-                                            <input type="hidden" name="deleted" value="work">
-                                        <% } %>
+                                            <form action="/delete/<%= active[i] %>" method="post">
                                         <input type="hidden" value="<%= id[i] %>" name="deletedTodo">
                                         <button class="badge bg-danger border-0" type="submit"><i class="fa-regular fa-trash-can"></i></button>
                                     </form>

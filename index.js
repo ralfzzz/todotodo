@@ -344,3 +344,51 @@ app.post('/custom/check/:tab', async (req,res,next) => {
         }
     });
 })
+
+// SHOW CUSTOM
+app.get("/custom", async (req,res)=>{
+        await List.find({}).then((e)=>{
+                let customTodo = [];
+                let idCustomTodo = [];
+                e.forEach(todos => {
+                    customTodo.unshift(todos.customTab);
+                    idCustomTodo.unshift(todos._id);
+                })
+                    res.render('add.ejs',{
+                        'todo' : customTodo, 
+                        'active': customTodo,
+                        'status': status,
+                        'id': idCustomTodo
+                    })
+                
+    }).catch(error => {
+        console.log(error);
+    });
+})
+
+// DELETE CUSTOM
+app.post("/delete/:tab", async (req,res)=>{
+    let tab = req.params.tab;
+    let customTab = _.capitalize(tab);
+    let customDeletedTodo = req.body.deletedTodo;
+    
+    await List.findOne({customTab: customTab}).exec().then((e) => {
+        if (e !== null) {
+            if (e.customTab == customTab) {
+                List.deleteOne(
+                    { _id: customDeletedTodo }
+                ).then(()=>{
+                    console.log("Data deleted!")
+                }).then(()=>{
+                    res.redirect('/custom');
+                });
+            }
+        }
+    });
+})
+
+// ADD CATEGORY
+app.post("/addCustom/",(req,res)=>{
+    let custom = req.body.todo;
+    res.redirect('/custom/'+custom);
+})
