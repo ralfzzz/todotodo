@@ -203,7 +203,7 @@ app.post('/checkedTodo', async (req,res) => {
 app.post('/checkedWorkTodo', async (req,res) => {
     let check = req.body.check;
     let key = req.body.key;
-    console.log(key);
+    // console.log(key);
     // console.log(req.body.add);
     if (check == "check") {
         await WorkTodo.updateOne({ _id: key },{statusWorkTodo: "uncheck"}).then(function(){
@@ -223,7 +223,7 @@ app.post('/checkedWorkTodo', async (req,res) => {
 
 // CUSTOM ROUTE //
 //CREATE MODEL/COLLECTIONS with data types & validations
-const defaultList = [{todo: "tes2", statusTodo: "uncheck"}]
+const defaultList = [{todo: "aDd another lists:)", statusTodo: "uncheck"}]
 const customListSchema = new mongoose.Schema({
     customTab: {
         type: String,
@@ -232,36 +232,115 @@ const customListSchema = new mongoose.Schema({
 });
 const List = mongoose.model('list', customListSchema);
 
-
-app.get("/custom", async (req,res,next) => {
-    res.render("tes");
-})
-
-app.get('/custom/:tab', async (req,res,next) => {
+// SHOW OR CREATE NEW
+app.get("/custom/:tab", async (req,res,next) => {
     let tab = req.params.tab;
     let customTab = _.capitalize(tab);
+
+        await List.findOne({customTab: customTab}).then((e)=>{
+            // console.log(res.lists);
+            if (e) {
+                todoList = [];
+                statusTodo = [];
+                e.lists.forEach(todos => {
+                    todoList.unshift(todos.todo);
+                    statusTodo.unshift(todos.statusTodo);
+                    idTodoList.unshift(todos._id)
+                });   
+                res.render('custom.ejs',{
+                    'todo' : todoList, 
+                    'active': customTab,
+                    'check': statusTodo,
+                    'status': status,
+                    'id': idTodoList
+                })
+            } else {
+                const list = new List({
+                    customTab: customTab,
+                    lists: defaultList
+                })
+                list.save().then(()=>{
+                    console.log("Data inserted!")
+                }).then(()=>{
+                    res.redirect('/custom/'+customTab);
+                });
+            }
+    }).catch(error => {
+        console.log(error);
+    });
+    
+})
+
+// ADD
+app.post('/custom/:tab', async (req,res,next) => {
+    let tab = req.params.tab;
+    let customTab = _.capitalize(tab);
+    let newCustomTodo = req.body.todo;
     
     await List.findOne({customTab: customTab}).exec().then((e) => {
         if (e !== null) {
             if (e.customTab == customTab) {
-                let add = ({todo: "tes2", statusTodo: "uncheck"});
+                let add = ({todo: newCustomTodo, statusTodo: "uncheck"});
                 List.updateOne(
-                    { customTab: res.customTab }, 
+                    { customTab: customTab }, 
                     { $push: { lists: add } }
                 ).then(()=>{
                     console.log("Data updated!")
+                }).then(()=>{
+                    res.redirect('/custom/'+customTab);
                 });
             }
-        } else {
-            const list = new List({
-                customTab: customTab,
-                lists: defaultList
-            })
-            list.save().then(()=>{
-                console.log("Data inserted!")
-            });
         }
     });
+})
 
-    // res.redirect("/custom");
+// DELETE
+app.post('/custom/delete/:tab', async (req,res,next) => {
+    let tab = req.params.tab;
+    let customTab = _.capitalize(tab);
+    let customDeletedTodo = req.body.deletedTodo;
+    
+    await List.findOne({customTab: customTab}).exec().then((e) => {
+        if (e !== null) {
+            if (e.customTab == customTab) {
+                List.updateOne(
+                    { customTab: customTab }, 
+                    {$pull: { lists: {_id: customDeletedTodo} } }
+                ).then(()=>{
+                    console.log("Data deleted!")
+                }).then(()=>{
+                    res.redirect('/custom/'+customTab);
+                });
+            }
+        }
+    });
+})
+
+// EDIT
+app.post('/custom/check/:tab', async (req,res,next) => {
+    let tab = req.params.tab;
+    let customTab = _.capitalize(tab);
+    let customDeletedTodo = req.body.key;
+    let customCheckTodo = req.body.check;
+    let updateCheck = '';
+    if (customCheckTodo == 'check') {
+        updateCheck = 'uncheck'
+    } else {
+        updateCheck = 'check'
+    }
+    
+    await List.findOne({customTab: customTab}).exec().then((e) => {
+        if (e !== null) {
+            if (e.customTab == customTab) {
+                List.updateOne(
+                    { 'lists._id': customDeletedTodo},
+                    { '$set': {'lists.$.statusTodo': updateCheck} }
+                ).then(()=>{
+                    console.log("Data updated!")
+                }).then(()=>{
+                    res.redirect('/custom/'+customTab);
+                });
+            }
+        }
+    });
 })
