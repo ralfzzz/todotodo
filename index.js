@@ -1,10 +1,10 @@
-import express from "express";
-import bodyParser from "body-parser";
+const express = require('express');
+const bodyParser = require('body-parser');
 // import cron from "node-cron";
-import mongoose from "mongoose";
+const mongoose = require('mongoose');
 // import mongooseUniqueValidator from "mongoose-unique-validator";
-import 'dotenv/config';
-import _ from "lodash";
+require('dotenv').config();
+const _ = require('lodash');
 
 const app = express();
 const port = 8003;
