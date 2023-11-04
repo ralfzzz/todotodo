@@ -1,2 +1,2 @@
 # todotodo
- todo list website using nodejs, expressjs, and ejs
+ todo list website using nodejs, expressjs, and mongodb
